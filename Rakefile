@@ -1,5 +1,7 @@
 require 'rubygems'
 require 'rake'
+require 'fileutils'
+include FileUtils
 
 begin
   require 'jeweler'
@@ -10,8 +12,11 @@ begin
     gem.email = "kyle@4rockets.com"
     gem.homepage = "http://github.com/kylejginavan/selenium_shots"
     gem.authors = ["Kyle J. Ginavan","Mauro Torres"]
+    gem.bindir = 'bin'
+    gem.files = Dir['lib/**/*.rb'] + Dir['templates/*']
     gem.add_development_dependency "thoughtbot-shoulda", ">= 0"
-    # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
+	  gem.add_dependency('rest-client', '>=0.8.2')
+	  gem.add_dependency('launchy', '>=0.3.2')
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
