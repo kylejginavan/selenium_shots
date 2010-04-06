@@ -1,41 +1,40 @@
 module SeleniumShots::Command
 	class Auth < Base
-		attr_accessor :credentials
+		attr_accessor :api_key_hash
 
 		def client
 			@client ||= init_selenium_shots
 		end
 
 		def init_selenium_shots
-			SeleniumShots::Client.new(user, password)
+			SeleniumShots::Client.new(api_key)
 		end
 
-		def user
-			get_credentials
-			@credentials[0]
+		def api_key
+      get_api_key
 		end
 
-		def password
-			get_credentials
-			@credentials[1]
+    def get_api_key_from_host
+      RestClient.post 'http://127.0.0.1:3000/selenium_tests/get_api_key', :user_session => { :login => @api_key_hash[0],
+                                                                                             :password => @api_key_hash[1]}
+    end
+
+		def api_key_file
+			"#{home_directory}/.selenium_shots/api_key"
 		end
 
-		def credentials_file
-			"#{home_directory}/.selenium_shots/credentials"
-		end
-
-		def get_credentials
-			return if @credentials
-			unless @credentials = read_credentials
-				@credentials = ask_for_credentials
-				save_credentials
+		def get_api_key
+			return if @api_key_hash
+			unless @api_key_hash = read_api_key
+				@api_key_hash = ask_for_api_key
+				save_api_key
 			end
-			@credentials
+			@api_key_hash
 		end
 
-		def read_credentials
-			if File.exists? credentials_file
-				return File.read(credentials_file).split("\n")
+		def read_api_key
+			if File.exists? api_key_file
+				return File.read(api_key_file).split("\n")
 			end
 		end
 
@@ -47,10 +46,10 @@ module SeleniumShots::Command
 			system "stty echo"
 		end
 
-		def ask_for_credentials
-			puts "Enter your SeleniumShots credentials."
+		def ask_for_api_key
+			puts "Enter your SeleniumShots Account"
 
-			print "Email: "
+			print "Login: "
 			user = ask
 
 			print "Password: "
@@ -84,20 +83,19 @@ module SeleniumShots::Command
 			return password
 		end
 
-		def save_credentials
+		def save_api_key
 			begin
-				write_credentials
-        #auth
+        @api_key_hash = get_api_key_from_host
+				write_api_key
 			rescue RestClient::Unauthorized => e
-				delete_credentials
+				delete_api_key
 				raise e unless retry_login?
-
 				display "\nAuthentication failed"
-				@credentials = ask_for_credentials
-				@client = init_heroku
+				@api_key_hash = ask_for_api_key
+				@client = init_selenium_shots
 				retry
 			rescue Exception => e
-				delete_credentials
+				delete_api_key
 				raise e
 			end
 		end
@@ -108,21 +106,21 @@ module SeleniumShots::Command
 			@login_attempts < 3
 		end
 
-		def write_credentials
-			FileUtils.mkdir_p(File.dirname(credentials_file))
-			File.open(credentials_file, 'w') do |f|
-				f.puts self.credentials
+		def write_api_key
+			FileUtils.mkdir_p(File.dirname(api_key_file))
+			File.open(api_key_file, 'w') do |f|
+				f.puts self.api_key_hash
 			end
-			set_credentials_permissions
+			set_api_key_permissions
 		end
 
-		def set_credentials_permissions
-			FileUtils.chmod 0700, File.dirname(credentials_file)
-			FileUtils.chmod 0600, credentials_file
+		def set_api_key_permissions
+			FileUtils.chmod 0700, File.dirname(api_key_file)
+			FileUtils.chmod 0600, api_key_file
 		end
 
-		def delete_credentials
-			FileUtils.rm_f(credentials_file)
+		def delete_api_key
+			FileUtils.rm_f(api_key_file)
 		end
 	end
 end

@@ -13,5 +13,4 @@ if File.exists?('config/environment.rb')
 else
   puts "No rails app found!, you need stay inside on the root of one rails app"
 end
-#  SeleniumShots::Command.run(command, args)
 

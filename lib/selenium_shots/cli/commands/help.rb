@@ -9,14 +9,13 @@ module SeleniumShots::Command
 === General Commands
 
  help                         # show this usage
- create [name]                # create bucket for your app
- list                         # list your apps
+ create [name]                # create file config for your app
 === Example story:
 
  rails myapp
  cd myapp
  (...make edits...)
- selenium_shots create
+ selenium_shots create example_one
 EOTXT
 		end
 	end

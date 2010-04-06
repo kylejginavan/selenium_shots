@@ -1,11 +1,9 @@
 module SeleniumShots::Command
 	class App < Base
     def create
-#      unless File.exists?(config_file)
-#        FileUtils.copy('selenium_shots.yml', 'config/selenium_shots.yml')
-#      end
 		  name    = args.shift.downcase.strip rescue nil
-		  selenium_shots.create(name)
+      api_key ||= SeleniumShots::Command.run_internal('auth:api_key', args)
+      make_config_file(name, api_key)
 		  display "Created #{name}"
     end
 
