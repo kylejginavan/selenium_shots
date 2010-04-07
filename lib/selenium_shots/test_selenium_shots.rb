@@ -8,10 +8,14 @@ require 'ostruct'
 
 #load config
 SeleniumConfig = OpenStruct.new(YAML.load_file("#{RAILS_ROOT}/config/selenium_shots.yml"))
-
+#
+PICS_WINDOWS_PATH = "Z:"
+PICS_LINUX_PATH   = ''
+PICS_MACOS_PATH   = ''
+#
 #activeresource models
 class SeleniumTest < ActiveResource::Base
-  self.site = "http://127.0.0.1:3000"
+  self.site = "http://seleniumshots.heroku.com"
   self.user = SeleniumConfig.api_key
 end
 
@@ -78,23 +82,23 @@ class ActiveSupport::TestCase
     browser.window_maximize
     sleep(2)
     if browser.browser_string.match(/XP/)
-      browser.capture_entire_page_screenshot("#{SeleniumConfig.pics_windows_path}\\#{src}", "background=#FFFFFF")
+      browser.capture_entire_page_screenshot("#{PICS_WINDOWS_PATH}\\#{src}", "background=#FFFFFF")
     elsif browser.browser_string.match(/SnowLeopard/)
-      browser.capture_entire_page_screenshot("#{SeleniumConfig.pics_macos_path}/#{src}", "background=#FFFFFF")
+      browser.capture_entire_page_screenshot("#{PICS_MACOS_PATH}/#{src}", "background=#FFFFFF")
     elsif browser.browser_string.match(/Linux/)
-      browser.capture_entire_page_screenshot("#{SeleniumConfig.pics_linux_path}/#{src}", "background=#FFFFFF")
+      browser.capture_entire_page_screenshot("#{PICS_LINUX_PATH}/#{src}", "background=#FFFFFF")
     end
   end
 
   def save_test(params)
-    src = "#{SeleniumConfig.bucket_name}_#{params[:selenium_test_group_name]}_#{params[:selenium_test_name]}_" +
+    src = "#{SeleniumConfig.application_name}_#{params[:selenium_test_group_name]}_#{params[:selenium_test_name]}_" +
           "#{browser.browser_string.gsub(/\s+/,"_").downcase}.png"
 
     capture_screenshot_on(src)
 
     SeleniumTest.create(:selenium_test_name => params[:selenium_test_name], :description => params[:description],
       :url => browser.location, :error_message => @error, :is_error => !@error.nil?, :environment => browser.browser_string,
-      :selenium_test_group_name => params[:selenium_test_group_name], :bucket_name => SeleniumConfig.bucket_name)
+      :selenium_test_group_name => params[:selenium_test_group_name], :application_name => SeleniumConfig.application_name)
   end
 end
 

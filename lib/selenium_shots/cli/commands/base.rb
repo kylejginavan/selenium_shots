@@ -38,16 +38,13 @@ module SeleniumShots::Command
     def make_config_file(name, api_key)
  			FileUtils.rm_f(config_file) if File.exists?(config_file)
       config_file_hash = <<EOFILE
-  api_key: "#{api_key}"
-  hub_url: 'url'
-  hub_port: 'port'
-  default_browser_url: 'default url'
-  pics_linux_path:   'set path'
-  pics_windows_path: 'set path'
-  pics_macos_path:   'set path'
-  bucket_name: "#{name}"
-  browsers:
-    - *firefox3
+api_key: "#{api_key}"
+hub_url: 'url'
+hub_port: 'port'
+default_browser_url: 'default url'
+application_name: "#{name}"
+browsers:
+    - IE8 on XP
 EOFILE
 			File.open(config_file, 'w') do |f|
 				f.puts config_file_hash
