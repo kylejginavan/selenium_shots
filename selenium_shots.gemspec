@@ -9,14 +9,14 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Kyle J. Ginavan", "Mauro Torres"]
-  s.date = %q{2010-04-07}
+  s.date = %q{2010-04-08}
   s.default_executable = %q{selenium_shots}
-  s.description = %q{longer description of selenium_shots}
+  s.description = %q{Selenium Shots is an Integration Testing Service that transparently distributes your integration tests across multiple operating systems with different versions of all major browsers AND captures a screen shot}
   s.email = %q{kyle@4rockets.com}
   s.executables = ["selenium_shots"]
   s.extra_rdoc_files = [
     "LICENSE",
-     "README",
+     "LICENSE.orig",
      "README.rdoc"
   ]
   s.files = [
@@ -34,7 +34,7 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.6}
-  s.summary = %q{test your applications}
+  s.summary = %q{Integration Tests made easy}
   s.test_files = [
     "test/helper.rb",
      "test/test_selenium_shots.rb"
