@@ -7,8 +7,8 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "selenium_shots"
-    gem.summary = %Q{test your applications}
-    gem.description = %Q{longer description of selenium_shots}
+    gem.summary = %Q{Integration Tests made easy}
+    gem.description = %Q{Selenium Shots is an Integration Testing Service that transparently distributes your integration tests across multiple operating systems with different versions of all major browsers AND captures a screen shot}
     gem.email = "kyle@4rockets.com"
     gem.homepage = "http://github.com/kylejginavan/selenium_shots"
     gem.authors = ["Kyle J. Ginavan","Mauro Torres"]
