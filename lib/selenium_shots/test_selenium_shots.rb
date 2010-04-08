@@ -9,41 +9,58 @@ require 'ostruct'
 #load config
 SeleniumConfig = OpenStruct.new(YAML.load_file("#{RAILS_ROOT}/config/selenium_shots.yml"))
 #
-PICS_WINDOWS_PATH = "Z:"
-PICS_LINUX_PATH   = ''
-PICS_MACOS_PATH   = ''
-#
+ENV["RAILS_ENV"] = "test"
+
 #activeresource models
 class SeleniumTest < ActiveResource::Base
-  self.site = "http://seleniumshots.heroku.com"
+  self.site = "http://127.0.0.1:3000"
   self.user = SeleniumConfig.api_key
 end
-
 
 class ActiveSupport::TestCase
 
   attr_reader :browser, :agent
 
-  def self.selenium_shot(description, &block)
-    #set vars
-    @description = description
+  if SeleniumConfig.mode == "remote"
+    PICS_WINDOWS_PATH = "Z:"
+    PICS_LINUX_PATH   = ''
+    PICS_MACOS_PATH   = ''
+    HOST = "staging.advisorshq.com"
+    PORT = "8888"
+  else
+    exec("selenium_shots_local_server start") unless File.exists?("/tmp/selenium_shots.pid")
+    PICS_WINDOWS_PATH = (SeleniumConfig.pics_windows_path || "")
+    PICS_LINUX_PATH   = (SeleniumConfig.pics_linux_path   || "")
+    PICS_MACOS_PATH   = (SeleniumConfig.pics_macos_path   || "")
+    HOST = "127.0.0.1"
+    PORT = "4444"
+  end
 
+  def self.selenium_shot(description, &block)
+    @@description = description
     test_name = "test_#{description.gsub(/\s+/,'_')}".to_sym
     defined = instance_method(test_name) rescue false
     raise "#{test_name} is already defined in #{self}" if defined
-    if block_given?
-      define_method(test_name, &block)
-    else
-      define_method(test_name) do
-        flunk "No implementation provided for #{name}"
+
+    SeleniumConfig.browsers.each do |browser|
+      BROWSER = browser
+      def setup
+        select_browser(BROWSER, "http://www.google.com")
+      end
+      if block_given?
+        define_method(test_name, &block)
+      else
+        define_method(test_name) do
+          flunk "No implementation provided for #{name}"
+        end
       end
     end
   end
 
   def select_browser(browser, url = nil)
     @browser = Selenium::Client::Driver.new \
-        :host => SeleniumConfig.hub_url,
-        :port => SeleniumConfig.hub_port,
+        :host => HOST,
+        :port => PORT,
         :browser => browser,
         :url => url || SeleniumConfig.default_browser_url,
         :timeout_in_second => 60,
@@ -73,7 +90,7 @@ class ActiveSupport::TestCase
 
   def teardown
     save_test ({:selenium_test_group_name => @group, :selenium_test_name => @name,
-                :description => @description})
+                :description => @@description})
     browser.close_current_browser_session
   end
 

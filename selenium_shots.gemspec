@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.default_executable = %q{selenium_shots}
   s.description = %q{Selenium Shots is an Integration Testing Service that transparently distributes your integration tests across multiple operating systems with different versions of all major browsers AND captures a screen shot}
   s.email = %q{kyle@4rockets.com}
-  s.executables = ["selenium_shots"]
+  s.executables = ["selenium_shots_local_server", "selenium_shots"]
   s.extra_rdoc_files = [
     "LICENSE",
      "LICENSE.orig",

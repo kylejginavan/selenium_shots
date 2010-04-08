@@ -1,0 +1,40 @@
+#!/usr/bin/env ruby
+
+def pid_file
+  '/tmp/selenium_shots.pid'
+end
+
+
+def start_process
+  server = "../vendor/selenium-server-1.0.2-SNAPSHOT-standalone.jar"
+  process_id = fork do
+    exec("java -jar #{server}")
+  end
+  File.open(pid_file, 'w') {|f| f.write(process_id) }
+end
+
+def stop_process
+  if File.exists?(pid_file)
+    process_id = File.open(pid_file,'r').readline
+    Process.kill 9, process_id.to_i
+    File.rm(pid_file)
+  end
+end
+
+
+help = <<EOF
+  selenium_shots_local_server {start|stop}
+EOF
+
+args = ARGV.dup
+ARGV.clear
+
+command = args.shift.strip rescue help
+
+case command
+  when "start"
+    start_process
+  when "stop":
+    stop_process
+end
+
