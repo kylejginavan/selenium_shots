@@ -17,7 +17,7 @@ class SeleniumTest < ActiveResource::Base
   self.user = SeleniumConfig.api_key
 end
 
-class ActiveSupport::TestCase
+class SeleniumShotsTest < ActiveSupport::TestCase
 
   attr_reader :browser, :agent
 
@@ -41,21 +41,52 @@ class ActiveSupport::TestCase
     test_name = "test_#{description.gsub(/\s+/,'_')}".to_sym
     defined = instance_method(test_name) rescue false
     raise "#{test_name} is already defined in #{self}" if defined
-
-    SeleniumConfig.browsers.each do |browser|
-      BROWSER = browser
-      def setup
-        select_browser(BROWSER, "http://www.google.com")
+    if block_given?
+      define_method(test_name) do
+        run_in_all_browsers(&block)
       end
-      if block_given?
-        define_method(test_name, &block)
-      else
-        define_method(test_name) do
-          flunk "No implementation provided for #{name}"
-        end
+    else
+      define_method(test_name) do
+        flunk "No implementation provided for #{name}"
       end
     end
   end
+
+  def run_in_all_browsers(&block)
+      errors = []
+      SeleniumConfig.browsers do |browser_spec|
+        begin
+          puts "aca"
+          run_browser(browser_spec, block)
+        rescue => error
+          type = browser_spec.match(/browser\": \"(.*)\", /)[1]
+          version = browser_spec.match(/browser-version\": \"(.*)\",/)[1]
+          errors << {:browser => type, :version => version, :error => error}
+        end
+      end
+      message = ""
+      errors.each_with_index do |error, index|
+        message +="\t[#{index+1}]: #{error[:error].message} occurred in #{error[:browser]}, version #{error[:version]}\n"
+      end
+      assert_equal 0, errors.length, "Expected zero failures or errors, but got #{errors.length}\n #{message}"
+  end
+
+  def run_browser(browser_spec, block)
+    browser = Selenium::Client::Driver.new \
+        :host => HOST,
+        :port => PORT,
+        :browser => browser,
+        :url => url || SeleniumConfig.default_browser_url,
+        :timeout_in_second => 60,
+        :highlight_located_element => true
+    browser.start_new_browser_session
+    begin
+      block.call(browser)
+    ensure
+      browser.close_current_browser_session
+    end
+  end
+
 
   def select_browser(browser, url = nil)
     @browser = Selenium::Client::Driver.new \
@@ -88,11 +119,15 @@ class ActiveSupport::TestCase
     end
   end
 
-  def teardown
-    save_test ({:selenium_test_group_name => @group, :selenium_test_name => @name,
-                :description => @@description})
-    browser.close_current_browser_session
-  end
+#  def setup
+#    select_browser(BROWSER, "http://www.google.com")
+#  end
+
+#  def teardown
+#    save_test ({:selenium_test_group_name => @group, :selenium_test_name => @name,
+#                :description => @@description})
+#    browser.close_current_browser_session
+#  end
 
   def capture_screenshot_on(src)
     browser.window_focus
