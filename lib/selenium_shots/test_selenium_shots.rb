@@ -17,7 +17,7 @@ class SeleniumTest < ActiveResource::Base
   self.user = SeleniumConfig.api_key
 end
 
-class SeleniumShotsTest < ActiveSupport::TestCase
+class SeleniumShotsTest < ActionController::IntegrationTest
 
   attr_reader :browser, :agent
 
@@ -36,14 +36,17 @@ class SeleniumShotsTest < ActiveSupport::TestCase
     PORT = "4444"
   end
 
-    def self.selenium_shot(description, &block)
+  def self.selenium_shot(description, &block)
     @@description = description
+    @@group = (@group || "Default")
     test_name = "test_#{description.gsub(/\s+/,'_')}".to_sym
     defined = instance_method(test_name) rescue false
     raise "#{test_name} is already defined in #{self}" if defined
     if block_given?
-     define_method(test_name, block) do
-       block.call
+     define_method(test_name) do
+       run_in_all_browsers do |browser|
+         instance_eval &block
+       end
      end
     else
       define_method(test_name) do
@@ -53,21 +56,21 @@ class SeleniumShotsTest < ActiveSupport::TestCase
   end
 
   def run_in_all_browsers(&block)
-      SeleniumConfig.browsers.each do |browser_spec|
-        begin
-          run_browser(browser_spec, block)
-          @error = nil
-        rescue => error
-          @error = error.message
-        end
-         assert @error.nil?, "Expected zero failures or errors, but got #{@error}\n"
+    SeleniumConfig.browsers.each do |browser_spec|
+      begin
+        run_browser(browser_spec, block)
+        @error = nil
+      rescue => error
+        @error = error.message
       end
+       assert @error.nil?, "Expected zero failures or errors, but got #{@error}\n"
+    end
   end
 
   def run_browser(browser_spec, block)
     @browser = Selenium::Client::Driver.new(
-                                           :host => "127.0.0.1",
-                                           :port => 4444,
+                                           :host => HOST,
+                                           :port => PORT,
                                            :browser => browser_spec,
                                            :url => SeleniumConfig.default_browser_url,
                                            :timeout_in_second => 120)
@@ -75,55 +78,11 @@ class SeleniumShotsTest < ActiveSupport::TestCase
     begin
       block.call(@browser)
     ensure
-      @browser.close_current_browser_session
-      save_test ({:selenium_test_group_name => @group, :selenium_test_name => @name,
+      save_test ({:selenium_test_group_name => @@group, :selenium_test_name => @name,
                 :description => @@description}) if SeleniumConfig.mode == "remote"
-
+      @browser.close_current_browser_session
     end
   end
-
-
-
-  def select_browser(browser, url = nil)
-    @browser = Selenium::Client::Driver.new \
-        :host => HOST,
-        :port => PORT,
-        :browser => browser,
-        :url => url || SeleniumConfig.default_browser_url,
-        :timeout_in_second => 60,
-        :highlight_located_element => true
-    @browser.start_new_browser_session
-  end
-
-  def hover_click(locator)
-    browser.mouse_over locator
-    browser.click locator
-    browser.focus locator
-  end
-
-  def open_and_wait(url)
-    browser.open url
-    browser.wait_for_page_to_load "30000"
-  end
-
-  def run_test(&proc)
-    begin
-      proc.call
-      @error = nil
-    rescue => e
-      @error = e.message
-    end
-  end
-
-#  def setup
-#    select_browser(BROWSER, "http://www.google.com")
-#  end
-
-#  def teardown
-#    save_test ({:selenium_test_group_name => @group, :selenium_test_name => @name,
-#                :description => @@description})
-#    browser.close_current_browser_session
-#  end
 
   def capture_screenshot_on(src)
     browser.window_focus
