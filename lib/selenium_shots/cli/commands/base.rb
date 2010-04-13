@@ -35,9 +35,20 @@ module SeleniumShots::Command
       'config/selenium_shots.yml'
     end
 
+
+  def ask_for_config_file
+    if File.exists?(config_file)
+			print "The config file exists, do you want overwrite this? (y/n): "
+			ask
+    else
+      "y"
+    end
+  end
+
     def make_config_file(name, api_key)
- 			FileUtils.rm_f(config_file) if File.exists?(config_file)
-      config_file_hash = <<EOFILE
+      overwrite_or_create_file = ask_for_config_file
+      if overwrite_or_create_file == "y"
+        config_file_hash = <<EOFILE
 #remote way
 api_key: "#{api_key}"
 mode: "remote"
@@ -49,17 +60,16 @@ browsers:
 #api_key: "#{api_key}"
 #mode: "local"
 #default_browser_url: "default url"
-#pics_linux_path:   '/home/mauro/pics'
-#pics_windows_path: 'Z:'
-#pics_macos_path:   'set path'
 #application_name: "#{name}"
 #browsers:
-    - "*firefox3"
+#   - "*firefox3"
 EOFILE
 			File.open(config_file, 'w') do |f|
 				f.puts config_file_hash
 			end
     end
+    overwrite_or_create_file
+  end
 
     def inside_rails_app?
       File.exists?('config/environment.rb')

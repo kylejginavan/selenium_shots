@@ -8,7 +8,7 @@ class SeleniumShots::Client
 
 	attr_reader :host, :api_key
 
-	def initialize(api_key, host='127.0.0.1:3000')
+	def initialize(api_key, host='seleniumshots.heroku.com')
 		@api_key  = api_key
 		@host     = host
 	end

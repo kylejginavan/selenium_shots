@@ -13,13 +13,14 @@ ENV["RAILS_ENV"] = "test"
 
 #activeresource models
 class SeleniumTest < ActiveResource::Base
-  self.site = "http://127.0.0.1:3000"
+  self.site = "http://seleniumshots.heroku.com"
   self.user = SeleniumConfig.api_key
 end
 
-class SeleniumShotsTest < ActionController::IntegrationTest
+class SeleniumShots < ActionController::IntegrationTest
 
   attr_reader :browser, :agent
+  cattr_accessor :expected_test_count
 
   if SeleniumConfig.mode == "remote"
     PICS_WINDOWS_PATH = "Z:"
@@ -28,12 +29,30 @@ class SeleniumShotsTest < ActionController::IntegrationTest
     HOST = "staging.advisorshq.com"
     PORT = "8888"
   else
-    exec("selenium_shots_local_server start") unless File.exists?("/tmp/selenium_shots.pid")
-    PICS_WINDOWS_PATH = (SeleniumConfig.pics_windows_path || "")
-    PICS_LINUX_PATH   = (SeleniumConfig.pics_linux_path   || "")
-    PICS_MACOS_PATH   = (SeleniumConfig.pics_macos_path   || "")
     HOST = "127.0.0.1"
     PORT = "4444"
+  end
+
+  def pid_file
+    "/tmp/selenium_shots.pid"
+  end
+
+  def setup
+    if(not self.class.expected_test_count)
+      self.class.expected_test_count = (self.class.instance_methods.reject{|method| method[0..3] != 'test'}).length
+      if  !File.exists?(pid_file) && SeleniumConfig.mode == "local"
+        IO.popen("selenium_shots_local_server start 2>&1")
+        sleep(2)
+      end
+    end
+  end
+
+  def teardown
+    if((self.class.expected_test_count-=1) == 0)
+      if File.exists?(pid_file) && SeleniumConfig.mode == "local"
+        IO.popen("selenium_shots_local_server stop 2>&1")
+      end
+    end
   end
 
   def self.selenium_shot(description, &block)
@@ -78,7 +97,7 @@ class SeleniumShotsTest < ActionController::IntegrationTest
     begin
       block.call(@browser)
     ensure
-      save_test ({:selenium_test_group_name => @@group, :selenium_test_name => @name,
+      save_test({:selenium_test_group_name => @@group, :selenium_test_name => @name,
                 :description => @@description}) if SeleniumConfig.mode == "remote"
       @browser.close_current_browser_session
     end
