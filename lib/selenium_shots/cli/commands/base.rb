@@ -51,18 +51,13 @@ module SeleniumShots::Command
         config_file_hash = <<EOFILE
 #remote way
 api_key: "#{api_key}"
-mode: "remote"
-default_browser_url: "default url"
+mode: "remote" # "local" for run test locally
+default_browser_url: "http://www.myapp.com"
 application_name: "#{name}"
 browsers:
-    - IE8 on XP
-#local way
-#api_key: "#{api_key}"
-#mode: "local"
-#default_browser_url: "default url"
-#application_name: "#{name}"
-#browsers:
-#   - "*firefox3"
+    - IE8 on XP          #browser for remote way
+    - Firefox3.6 on XP   #browser for remote way
+#   - "*firefox3" #browser for local way
 EOFILE
 			File.open(config_file, 'w') do |f|
 				f.puts config_file_hash
