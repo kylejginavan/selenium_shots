@@ -1,6 +1,5 @@
 require 'rubygems'
-require 'rexml/document'
-require 'rest_client'
+#require 'rest_client'
 require 'uri'
 require 'time'
 
@@ -38,16 +37,5 @@ class SeleniumShots::Client
 	def delete(uri)
 		resource(uri).delete
 	end
-
-	def xml(raw)   # :nodoc:
-		REXML::Document.new(raw)
-	end
-
-	def escape(value)  # :nodoc:
-		escaped = URI.escape(value.to_s, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
-		escaped.gsub('.', '%2E') # not covered by the previous URI.escape
-	end
-
-
 end
 
