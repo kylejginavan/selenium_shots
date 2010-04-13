@@ -13,10 +13,9 @@ begin
     gem.homepage = "http://github.com/kylejginavan/selenium_shots"
     gem.authors = ["Kyle J. Ginavan","Mauro Torres"]
     gem.bindir = 'bin'
-    gem.files = Dir['lib/**/*.rb']
+    gem.files = Dir['lib/**/*.rb'] + Dir['vendor/*']
     gem.add_development_dependency "thoughtbot-shoulda", ">= 0"
 	  gem.add_dependency('rest-client', '>=0.8.2')
-	  gem.add_dependency('launchy', '>=0.3.2')
     gem.add_dependency('selenium-client','>=1.2.18')
   end
   Jeweler::GemcutterTasks.new

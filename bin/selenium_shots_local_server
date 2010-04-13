@@ -1,0 +1,54 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'fileutils'
+
+GEM_ROOT        = File.expand_path(File.join(File.dirname(__FILE__), '..'))
+SELENIUM_SERVER = File.join(GEM_ROOT, 'vendor', 'selenium-server-1.0.2-SNAPSHOT-standalone.jar')
+
+
+module SeleniumShots
+  module Server
+    class << self
+      def pid_file
+        '/tmp/selenium_shots.pid'
+      end
+
+      def start_process
+        if File.exists?(pid_file)
+          puts "the selenium shots server is running...."
+        else
+          pipe = IO.popen("java -jar #{SELENIUM_SERVER}")
+          File.open(pid_file, 'w') {|f| f.write(pipe.pid) }
+        end
+      end
+
+      def stop_process
+        if File.exists?(pid_file)
+          process_id = File.open(pid_file,'r').readline
+          Process.kill 9, process_id.to_i
+          FileUtils.rm(pid_file)
+        end
+      end
+    end
+  end
+end
+
+help = <<EOF
+  selenium_shots_local_server {start|stop}
+EOF
+
+args = ARGV.dup
+ARGV.clear
+
+command = args.shift.strip rescue help
+
+case command
+  when "start"
+    SeleniumShots::Server.start_process
+  when "stop":
+    SeleniumShots::Server.stop_process
+  else
+    puts help
+end
+

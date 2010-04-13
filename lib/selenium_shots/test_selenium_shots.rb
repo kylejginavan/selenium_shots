@@ -9,30 +9,64 @@ require 'ostruct'
 #load config
 SeleniumConfig = OpenStruct.new(YAML.load_file("#{RAILS_ROOT}/config/selenium_shots.yml"))
 #
-PICS_WINDOWS_PATH = "Z:"
-PICS_LINUX_PATH   = ''
-PICS_MACOS_PATH   = ''
-#
+ENV["RAILS_ENV"] = "test"
+
 #activeresource models
 class SeleniumTest < ActiveResource::Base
   self.site = "http://seleniumshots.heroku.com"
   self.user = SeleniumConfig.api_key
 end
 
-
-class ActiveSupport::TestCase
+class SeleniumShots < ActionController::IntegrationTest
 
   attr_reader :browser, :agent
+  cattr_accessor :expected_test_count
+
+  if SeleniumConfig.mode == "remote"
+    PICS_WINDOWS_PATH = "Z:"
+    PICS_LINUX_PATH   = ''
+    PICS_MACOS_PATH   = ''
+    HOST = "staging.advisorshq.com"
+    PORT = "8888"
+  else
+    HOST = "127.0.0.1"
+    PORT = "4444"
+  end
+
+  def pid_file
+    "/tmp/selenium_shots.pid"
+  end
+
+  def setup
+    if(not self.class.expected_test_count)
+      self.class.expected_test_count = (self.class.instance_methods.reject{|method| method[0..3] != 'test'}).length
+      if  !File.exists?(pid_file) && SeleniumConfig.mode == "local"
+        IO.popen("selenium_shots_local_server start 2>&1")
+        sleep(2)
+      end
+    end
+  end
+
+  def teardown
+    if((self.class.expected_test_count-=1) == 0)
+      if File.exists?(pid_file) && SeleniumConfig.mode == "local"
+        IO.popen("selenium_shots_local_server stop 2>&1")
+      end
+    end
+  end
 
   def self.selenium_shot(description, &block)
-    #set vars
-    @description = description
-
+    @@description = description
+    @@group = (@group || "Default")
     test_name = "test_#{description.gsub(/\s+/,'_')}".to_sym
     defined = instance_method(test_name) rescue false
     raise "#{test_name} is already defined in #{self}" if defined
     if block_given?
-      define_method(test_name, &block)
+     define_method(test_name) do
+       run_in_all_browsers do |browser|
+         instance_eval &block
+       end
+     end
     else
       define_method(test_name) do
         flunk "No implementation provided for #{name}"
@@ -40,41 +74,33 @@ class ActiveSupport::TestCase
     end
   end
 
-  def select_browser(browser, url = nil)
-    @browser = Selenium::Client::Driver.new \
-        :host => SeleniumConfig.hub_url,
-        :port => SeleniumConfig.hub_port,
-        :browser => browser,
-        :url => url || SeleniumConfig.default_browser_url,
-        :timeout_in_second => 60,
-        :highlight_located_element => true
-    @browser.start_new_browser_session
-  end
-
-  def hover_click(locator)
-    browser.mouse_over locator
-    browser.click locator
-    browser.focus locator
-  end
-
-  def open_and_wait(url)
-    browser.open url
-    browser.wait_for_page_to_load "30000"
-  end
-
-  def run_test(&proc)
-    begin
-      proc.call
-      @error = nil
-    rescue => e
-      @error = e.message
+  def run_in_all_browsers(&block)
+    SeleniumConfig.browsers.each do |browser_spec|
+      begin
+        run_browser(browser_spec, block)
+        @error = nil
+      rescue => error
+        @error = error.message
+      end
+       assert @error.nil?, "Expected zero failures or errors, but got #{@error}\n"
     end
   end
 
-  def teardown
-    save_test ({:selenium_test_group_name => @group, :selenium_test_name => @name,
-                :description => @description})
-    browser.close_current_browser_session
+  def run_browser(browser_spec, block)
+    @browser = Selenium::Client::Driver.new(
+                                           :host => HOST,
+                                           :port => PORT,
+                                           :browser => browser_spec,
+                                           :url => SeleniumConfig.default_browser_url,
+                                           :timeout_in_second => 120)
+    @browser.start_new_browser_session
+    begin
+      block.call(@browser)
+    ensure
+      save_test({:selenium_test_group_name => @@group, :selenium_test_name => @name,
+                :description => @@description}) if SeleniumConfig.mode == "remote"
+      @browser.close_current_browser_session
+    end
   end
 
   def capture_screenshot_on(src)
