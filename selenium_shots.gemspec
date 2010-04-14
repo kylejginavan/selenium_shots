@@ -37,7 +37,8 @@ Gem::Specification.new do |s|
   s.summary = %q{Integration Tests made easy}
   s.test_files = [
     "test/helper.rb",
-     "test/test_selenium_shots.rb"
+     "test/test_selenium_shots.rb",
+     "examples/google.rb"
   ]
 
   if s.respond_to? :specification_version then

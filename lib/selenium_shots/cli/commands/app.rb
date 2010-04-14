@@ -9,15 +9,6 @@ module SeleniumShots::Command
         display "You need specify a name for your app. Run 'selenium_shots help' for usage information"
       end
     end
-
-    def list
-			list = selenium_shots.list
-			if list.size > 0
-				display list.join("\n")
-			else
-				display "You have no apps."
-			end
-		end
 	end
 end
 

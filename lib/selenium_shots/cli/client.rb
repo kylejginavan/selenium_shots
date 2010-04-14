@@ -12,11 +12,6 @@ class SeleniumShots::Client
 		@host     = host
 	end
 
-  def list
-    #get list app from selenium_shots
-    []
-  end
-
 ############
 	def resource(uri)
 		RestClient::Resource.new("http://#{host}", api_key)[uri]
