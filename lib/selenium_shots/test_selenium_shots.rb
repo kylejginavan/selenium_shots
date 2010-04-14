@@ -37,6 +37,22 @@ class SeleniumShots < ActionController::IntegrationTest
     "/tmp/selenium_shots.pid"
   end
 
+  def local_browsers
+    [ "*firefox3", "*iexplore", "*safari"]
+  end
+
+  def selected_browsers
+    if SeleniumConfig.mode == "remote"
+      SeleniumConfig.browsers
+    else
+      if defined?(SeleniumConfig.local_browser)
+        [SeleniumConfig.local_browser]
+     else
+        [local_browsers.first]
+     end
+    end
+  end
+
   def setup
     if(not self.class.expected_test_count)
       self.class.expected_test_count = (self.class.instance_methods.reject{|method| method[0..3] != 'test'}).length
@@ -75,14 +91,23 @@ class SeleniumShots < ActionController::IntegrationTest
   end
 
   def run_in_all_browsers(&block)
-    SeleniumConfig.browsers.each do |browser_spec|
+    browsers = (@selected_browser || selected_browsers)
+    browsers.each do |browser_spec|
       begin
         run_browser(browser_spec, block)
         @error = nil
-      rescue => error
+      rescue  => error
         @error = error.message
+        if @error.match(/Failed to start new browser session/) && SeleniumConfig.mode == "local"
+          @tmp_browsers ||= local_browsers
+          @tmp_browsers.delete(browser_spec)
+          @selected_browser  = [@tmp_browsers.shift]
+          unless @selected_browser.empty?
+            run_in_all_browsers(&block)
+          end
+        end
       end
-       assert @error.nil?, "Expected zero failures or errors, but got #{@error}\n"
+      assert @error.nil?, "Expected zero failures or errors, but got #{@error}\n"
     end
   end
 

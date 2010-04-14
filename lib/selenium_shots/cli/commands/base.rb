@@ -49,16 +49,14 @@ module SeleniumShots::Command
       overwrite_or_create_file = ask_for_config_file
       if overwrite_or_create_file == "y"
         config_file_hash = <<EOFILE
-#remote way
 api_key: "#{api_key}"
 mode: "remote" # "local" for run test locally
 default_browser_url: "http://www.myapp.com"
 application_name: "#{name}"
+local_browser: "*firefox3"
 browsers:
-    - IE8 on XP          #browser for remote way
-    - Firefox3.6 on XP   #browser for remote way
-#   - "*firefox3" #browser for local way
-#   - "*iexplore" #browser for local way
+    - IE8 on XP
+    - Firefox3.6 on XP
 EOFILE
 			File.open(config_file, 'w') do |f|
 				f.puts config_file_hash
