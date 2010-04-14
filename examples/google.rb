@@ -6,9 +6,9 @@ class Google < SeleniumShots
 
   selenium_shot "should search on google" do
     @name = "selenium shots"
-   	browser.open "/"
-	  browser.type "q", "Selenium Shots"
-	  browser.click "btnG"
+    browser.open "/"
+    browser.type "q", "Selenium Shots"
+    browser.click "btnG"
   end
 
 end
