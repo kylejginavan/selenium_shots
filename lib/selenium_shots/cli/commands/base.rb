@@ -58,6 +58,7 @@ browsers:
     - IE8 on XP          #browser for remote way
     - Firefox3.6 on XP   #browser for remote way
 #   - "*firefox3" #browser for local way
+#   - "*iexplore" #browser for local way
 EOFILE
 			File.open(config_file, 'w') do |f|
 				f.puts config_file_hash
