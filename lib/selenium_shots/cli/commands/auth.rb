@@ -96,7 +96,7 @@ module SeleniumShots::Command
 				retry
 			rescue Exception => e
 				delete_api_key
-				raise e
+				display "\nAuthentication failed. You can go to http://www.seleniumshots.com for more information"
 			end
 		end
 

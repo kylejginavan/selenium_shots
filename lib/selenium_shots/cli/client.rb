@@ -1,5 +1,5 @@
 require 'rubygems'
-#require 'rest_client'
+require 'rest_client'
 require 'uri'
 require 'time'
 
