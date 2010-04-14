@@ -8,6 +8,8 @@ module SeleniumShots
 				run_internal(command, args)
 			rescue InvalidCommand
 				display "Unknown command. Run 'selenium_shots help' for usage information."
+    	rescue RestClient::Unauthorized
+				display "Authentication failure. For more information you can go to http://www.seleniumshots.com"
 			end
 
 			def run_internal(command, args)
