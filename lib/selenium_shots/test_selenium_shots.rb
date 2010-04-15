@@ -8,7 +8,6 @@ require 'ostruct'
 #load config
 SeleniumConfig = OpenStruct.new(YAML.load_file("#{RAILS_ROOT}/config/selenium_shots.yml"))
 #
-ENV["RAILS_ENV"] = "test"
 
 #activeresource models
 class SeleniumTest < ActiveResource::Base

@@ -8,8 +8,9 @@ module SeleniumShots::Command
 			usage = <<EOTXT
 === General Commands
 
- help                         # show this usage
- create [name]                # create file config for your app
+ help                     # show this usage
+ create [name]            # create file config for your app
+
 === Example story:
 
  rails myapp

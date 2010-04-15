@@ -11,6 +11,10 @@ module SeleniumShots::Command
 			@selenium_shots ||= SeleniumShots::Command.run_internal('auth:client', args)
 		end
 
+    def selenium_shots_api_key
+      @api_key ||= SeleniumShots::Command.run_internal('auth:api_key', args)
+    end
+
 		def display(msg, newline=true)
 			newline ? puts(msg) : print(msg)
 		end
@@ -38,7 +42,7 @@ module SeleniumShots::Command
 
   def ask_for_config_file
     if File.exists?(config_file)
-			print "The config file exists, do you want overwrite this? (y/n): "
+			print "The file config/selenium_shots.yml exists, do you want overwrite this? (y/n): "
 			ask
     else
       "y"
@@ -64,10 +68,6 @@ EOFILE
     end
     overwrite_or_create_file
   end
-
-    def inside_rails_app?
-      File.exists?('config/environment.rb')
-    end
 
 	end
 

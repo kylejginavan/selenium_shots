@@ -25,17 +25,17 @@ end
 
 require 'rake/testtask'
 Rake::TestTask.new(:test) do |test|
-  test.libs << 'lib' << 'test'
-  test.pattern = 'test/**/test_*.rb'
+  test.libs << 'spec'
+  test.pattern = 'spec/**/*_spec.rb'
   test.verbose = true
 end
 
 begin
   require 'rcov/rcovtask'
   Rcov::RcovTask.new do |test|
-    test.libs << 'test'
-    test.pattern = 'test/**/test_*.rb'
-    test.verbose = true
+  test.libs << 'spec'
+  test.pattern = 'spec/**/*_spec.rb'
+  test.verbose = true
   end
 rescue LoadError
   task :rcov do
@@ -55,5 +55,12 @@ Rake::RDocTask.new do |rdoc|
   rdoc.title = "selenium_shots #{version}"
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
+end
+
+require 'spec/rake/spectask'
+desc "Run all specs"
+Spec::Rake::SpecTask.new('spec') do |t|
+	t.spec_opts = ['--colour --format progress --loadby mtime --reverse']
+	t.spec_files = FileList['spec/**/*_spec.rb']
 end
 

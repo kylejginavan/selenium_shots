@@ -1,10 +1,10 @@
 module SeleniumShots::Command
 	class App < Base
     def create
-		  name    = args.shift.downcase.strip rescue nil
+		  name = args.shift.downcase.strip rescue nil
       if name
-        api_key ||= SeleniumShots::Command.run_internal('auth:api_key', args)
-        if make_config_file(name, api_key) == "y"
+        selenium_shots_api_key
+        if make_config_file(name, @api_key) == "y"
 		      display "Created #{name}\nYou can configurate selenium shots on config/selenium_shots.yml"
         end
       else
