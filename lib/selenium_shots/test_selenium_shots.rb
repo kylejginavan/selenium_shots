@@ -5,7 +5,6 @@ require 'active_support'
 require 'active_support/test_case'
 require 'ostruct'
 
-
 #load config
 SeleniumConfig = OpenStruct.new(YAML.load_file("#{RAILS_ROOT}/config/selenium_shots.yml"))
 #
@@ -38,7 +37,7 @@ class SeleniumShots < ActionController::IntegrationTest
   end
 
   def local_browsers
-    [ "*firefox3", "*iexplore", "*safari"]
+    ["*firefox3", "*iexplore", "*safari"]
   end
 
   def selected_browsers
@@ -103,6 +102,7 @@ class SeleniumShots < ActionController::IntegrationTest
           @tmp_browsers.delete(browser_spec)
           @selected_browser  = [@tmp_browsers.shift]
           unless @selected_browser.empty?
+            puts "The browser #{browser_spec} is not available, selenium_shots going to try with #{@selected_browser} browser"
             run_in_all_browsers(&block)
           end
         end
