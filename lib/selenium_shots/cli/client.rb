@@ -1,5 +1,5 @@
 require 'rubygems'
-#require 'rest_client'
+require 'rest_client'
 require 'uri'
 require 'time'
 
@@ -11,11 +11,6 @@ class SeleniumShots::Client
 		@api_key  = api_key
 		@host     = host
 	end
-
-  def list
-    #get list app from selenium_shots
-    []
-  end
 
 ############
 	def resource(uri)

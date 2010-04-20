@@ -5,11 +5,9 @@ require 'active_support'
 require 'active_support/test_case'
 require 'ostruct'
 
-
 #load config
 SeleniumConfig = OpenStruct.new(YAML.load_file("#{RAILS_ROOT}/config/selenium_shots.yml"))
 #
-ENV["RAILS_ENV"] = "test"
 
 #activeresource models
 class SeleniumTest < ActiveResource::Base
@@ -35,6 +33,22 @@ class SeleniumShots < ActionController::IntegrationTest
 
   def pid_file
     "/tmp/selenium_shots.pid"
+  end
+
+  def local_browsers
+    ["*firefox3", "*iexplore", "*safari"]
+  end
+
+  def selected_browsers
+    if SeleniumConfig.mode == "remote"
+      SeleniumConfig.browsers
+    else
+      if defined?(SeleniumConfig.local_browser)
+        [SeleniumConfig.local_browser]
+     else
+        [local_browsers.first]
+     end
+    end
   end
 
   def setup
@@ -75,14 +89,24 @@ class SeleniumShots < ActionController::IntegrationTest
   end
 
   def run_in_all_browsers(&block)
-    SeleniumConfig.browsers.each do |browser_spec|
+    browsers = (@selected_browser || selected_browsers)
+    browsers.each do |browser_spec|
       begin
         run_browser(browser_spec, block)
         @error = nil
-      rescue => error
+      rescue  => error
         @error = error.message
+        if @error.match(/Failed to start new browser session/) && SeleniumConfig.mode == "local"
+          @tmp_browsers ||= local_browsers
+          @tmp_browsers.delete(browser_spec)
+          @selected_browser  = [@tmp_browsers.shift]
+          unless @selected_browser.empty?
+            puts "The browser #{browser_spec} is not available, selenium_shots going to try with #{@selected_browser} browser"
+            run_in_all_browsers(&block)
+          end
+        end
       end
-       assert @error.nil?, "Expected zero failures or errors, but got #{@error}\n"
+      assert @error.nil?, "Expected zero failures or errors, but got #{@error}\n"
     end
   end
 
