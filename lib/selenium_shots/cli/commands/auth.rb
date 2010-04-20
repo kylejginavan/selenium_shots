@@ -15,8 +15,8 @@ module SeleniumShots::Command
 		end
 
     def get_api_key_from_host
-      RestClient.post 'http://seleniumshots.heroku.com/selenium_tests/get_api_key', :user_session => { :email => @api_key_hash[0],
-                                                                                    :password => @api_key_hash[1]}
+      RestClient.post 'http://seleniumshots.com/selenium_tests/get_api_key', :user_session => { :email => @api_key_hash[0],
+                                                                             :password => @api_key_hash[1]}
     end
 
 		def api_key_file

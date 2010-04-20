@@ -11,7 +11,7 @@ SeleniumConfig = OpenStruct.new(YAML.load_file("#{RAILS_ROOT}/config/selenium_sh
 
 #activeresource models
 class SeleniumTest < ActiveResource::Base
-  self.site = "http://seleniumshots.heroku.com"
+  self.site = "http://seleniumshots.com"
   self.user = SeleniumConfig.api_key
 end
 
