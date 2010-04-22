@@ -54,7 +54,8 @@ class SeleniumShots < ActionController::IntegrationTest
   def setup
     if(not self.class.expected_test_count)
       self.class.expected_test_count = (self.class.instance_methods.reject{|method| method[0..3] != 'test'}).length
-      if  !File.exists?(pid_file) && SeleniumConfig.mode == "local"
+      if SeleniumConfig.mode == "local"
+        FileUtils.rm(pid_file) if  File.exists?(pid_file)
         IO.popen("selenium_shots_local_server start 2>&1")
         sleep(2)
       end
@@ -116,7 +117,7 @@ class SeleniumShots < ActionController::IntegrationTest
                                            :port => PORT,
                                            :browser => browser_spec,
                                            :url => SeleniumConfig.default_browser_url,
-                                           :timeout_in_second => 120)
+                                           :timeout_in_second => 200)
     @browser.start_new_browser_session
     begin
       block.call(@browser)
