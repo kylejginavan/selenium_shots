@@ -96,7 +96,7 @@ class SeleniumShots < ActionController::IntegrationTest
         run_browser(browser_spec, block)
         @error = nil
       rescue  => error
-        @browser.close_current_browser_session
+        @browser.close_current_browser_session if @browser
         @error = error.message
         if @error.match(/Failed to start new browser session/) && SeleniumConfig.mode == "local"
           @tmp_browsers ||= local_browsers
