@@ -1,11 +1,11 @@
 module SeleniumShots::Command
-	class Help < Base
-		def index
-			display usage
-		end
+  class Help < Base
+    def index
+      display usage
+    end
 
-		def usage
-			usage = <<EOTXT
+    def usage
+      usage = <<EOTXT
 === General Commands
 
  help                     # show this usage
@@ -18,7 +18,7 @@ module SeleniumShots::Command
  (...make edits...)
  selenium_shots create example_one
 EOTXT
-		end
-	end
+    end
+  end
 end
 
