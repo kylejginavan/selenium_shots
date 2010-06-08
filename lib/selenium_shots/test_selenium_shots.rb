@@ -107,8 +107,8 @@ class SeleniumShots < ActionController::IntegrationTest
           end
         end
       end
-      assert @error.nil?, "Expected zero failures or errors, but got #{@error}\n"
     end
+    assert @error.nil?, "Expected zero failures or errors, but got #{@error}\n"
   end
 
   def run_browser(browser_spec, block)
