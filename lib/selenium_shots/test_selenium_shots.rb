@@ -96,6 +96,7 @@ class SeleniumShots < ActionController::IntegrationTest
         run_browser(browser_spec, block)
         @error = nil
       rescue  => error
+        @browser.close_current_browser_session if @browser
         @error = error.message
         if @error.match(/Failed to start new browser session/) && SeleniumConfig.mode == "local"
           @tmp_browsers ||= local_browsers
@@ -107,8 +108,8 @@ class SeleniumShots < ActionController::IntegrationTest
           end
         end
       end
-      assert @error.nil?, "Expected zero failures or errors, but got #{@error}\n"
     end
+    assert @error.nil?, "Expected zero failures or errors, but got #{@error}\n"
   end
 
   def run_browser(browser_spec, block)
