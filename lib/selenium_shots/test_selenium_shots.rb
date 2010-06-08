@@ -93,8 +93,8 @@ class SeleniumShots < ActionController::IntegrationTest
     browsers = (@selected_browser || selected_browsers)
     browsers.each do |browser_spec|
       begin
-        run_browser(browser_spec, block)
         @error = nil
+        run_browser(browser_spec, block)
       rescue  => error
         @browser.close_current_browser_session if @browser
         @error = error.message
@@ -122,6 +122,8 @@ class SeleniumShots < ActionController::IntegrationTest
     @browser.start_new_browser_session
     begin
       block.call(@browser)
+    rescue  => error
+      @error = error.message
     ensure
       save_test({:selenium_test_group_name => @@group, :selenium_test_name => @name,
                 :description => @@description}) if SeleniumConfig.mode == "remote"
