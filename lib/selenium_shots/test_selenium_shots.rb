@@ -71,13 +71,13 @@ class SeleniumShots < ActionController::IntegrationTest
   end
 
   def self.selenium_shot(description, &block)
-    @@description = description
     @@group = (@group || "Default")
     test_name = "test_#{description.gsub(/\s+/,'_')}".to_sym
     defined = instance_method(test_name) rescue false
     raise "#{test_name} is already defined in #{self}" if defined
     if block_given?
      define_method(test_name) do
+       @description = description
        run_in_all_browsers do |browser|
          instance_eval &block
        end
@@ -90,10 +90,10 @@ class SeleniumShots < ActionController::IntegrationTest
   end
 
   def run_in_all_browsers(&block)
+    @error = nil
     browsers = (@selected_browser || selected_browsers)
     browsers.each do |browser_spec|
       begin
-        @error = nil
         run_browser(browser_spec, block)
       rescue  => error
         @browser.close_current_browser_session if @browser
@@ -126,7 +126,7 @@ class SeleniumShots < ActionController::IntegrationTest
       @error = error.message
     ensure
       save_test({:selenium_test_group_name => @@group, :selenium_test_name => @name,
-                :description => @@description}) if SeleniumConfig.mode == "remote"
+                :description => @description}) if SeleniumConfig.mode == "remote"
       @browser.close_current_browser_session
     end
   end
