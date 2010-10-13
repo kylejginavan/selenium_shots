@@ -32,7 +32,7 @@ In configure/selenium_shots.yml you will need to define the application
 == Creating Tests
 
 
-   class AdvisorTest < SeleniumShots
+   class MyTest < SeleniumShots
   
      @group = "MyTestGroup"
   
@@ -43,6 +43,12 @@ In configure/selenium_shots.yml you will need to define the application
        browser.click "find"
      end
    end
+   
+== Selenium Setup
+Download the latest version of selenium grid from http://seleniumhq.org/download/
+
+===Using a Custom Selenium Server
+`ant launch-remote-control -DcustomRemoteControl=/path/to/your/customer/selenium-server.jar`
 
 == Copyright
 
