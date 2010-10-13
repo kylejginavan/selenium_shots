@@ -32,16 +32,17 @@ In configure/selenium_shots.yml you will need to define the application
 == Creating Tests
 
 
-  $ class AdvisorTest < SeleniumShots
-  $
-  $   @group = "MyTestGroup"
-  $
-  $   selenium_shot "Should run my test and pass." do
-  $     @name = "My Test Name"
-  $     browser.open "/my_site"
-  $     browser.type "search[query]", "Cats"
-  $     browser.click "find"
-  $   end
+   class AdvisorTest < SeleniumShots
+  
+     @group = "MyTestGroup"
+  
+     selenium_shot "Should run my test and pass." do
+       @name = "My Test Name"
+       browser.open "/my_site"
+       browser.type "search[query]", "Cats"
+       browser.click "find"
+     end
+   end
 
 == Copyright
 
