@@ -137,6 +137,8 @@ class SeleniumShots < ActionController::IntegrationTest
     @driver.manage.timeouts.implicit_wait = 2 #seconds
     Selenium::WebDriver::Remote::Http::Default.timeout = 20 #seconds
     
+    @driver.navigate.to SeleniumConfig.default_browser_url
+    
     begin
       block.call(@browser)
     rescue  => error
