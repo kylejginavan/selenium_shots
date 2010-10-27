@@ -118,11 +118,11 @@ class SeleniumShots < ActionController::IntegrationTest
     
     if SeleniumConfig.mode == "local"
       if /(firefox)/i.match(browser_spec)
-        @driver = Selenium::WebDriver.for(:firefox)
+        @driver = Selenium::WebDriver.for(:firefox, :url => SeleniumConfig.default_browser_url)
       elsif /(chrome)/i.match(browser_spec)
-        @driver = Selenium::WebDriver.for(:chrome)
+        @driver = Selenium::WebDriver.for(:chrome, :url => SeleniumConfig.default_browser_url)
       elsif /(ie)/i.match(browser_spec)
-        @driver = Selenium::WebDriver.for(:ie)
+        @driver = Selenium::WebDriver.for(:ie, :url => SeleniumConfig.default_browser_url)
       end
     else
       if /(firefox)/i.match(browser_spec)
@@ -137,8 +137,7 @@ class SeleniumShots < ActionController::IntegrationTest
     @driver.manage.timeouts.implicit_wait = 2 #seconds
     Selenium::WebDriver::Remote::Http::Default.timeout = 20 #seconds
     
-    @driver.navigate.to SeleniumConfig.default_browser_url
-    
+
     begin
       block.call(@browser)
     rescue  => error
