@@ -123,6 +123,7 @@ class SeleniumShots < ActionController::IntegrationTest
         @driver = Selenium::WebDriver.for(:chrome)
       elsif /(ie)/i.match(browser_spec)
         @driver = Selenium::WebDriver.for(:ie)
+      end
     else
       if /(firefox)/i.match(browser_spec)
         @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :firefox, )
@@ -130,6 +131,7 @@ class SeleniumShots < ActionController::IntegrationTest
         @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :chrome)
       elsif /(ie)/i.match(browser_spec)
         @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :ie)
+      end
     end
     
     @driver.manage.timeouts.implicit_wait = 2 #seconds
@@ -143,9 +145,7 @@ class SeleniumShots < ActionController::IntegrationTest
       save_test({:selenium_test_group_name => @@group, :selenium_test_name => @name,
                 :description => @description}) if SeleniumConfig.mode == "remote"
       @driver.quit
-    end
-    
-      
+    end 
   end
 
   def run_browser(browser_spec, block)
