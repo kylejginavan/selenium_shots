@@ -95,7 +95,7 @@ class SeleniumShots < ActionController::IntegrationTest
     browsers = (@selected_browser || selected_browsers)
     browsers.each do |browser_spec|
       begin
-        run_driver(browser_spec, block)
+        run_webdriver(browser_spec, block)
       rescue  => error
         @browser.close_current_browser_session if @browser
         @error = error.message
