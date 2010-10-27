@@ -1,6 +1,7 @@
 require "test/unit"
 require "rubygems"
 require "selenium/client"
+require "selenium-webdriver"
 require 'active_support'
 require 'active_support/test_case'
 require 'ostruct'
@@ -94,7 +95,7 @@ class SeleniumShots < ActionController::IntegrationTest
     browsers = (@selected_browser || selected_browsers)
     browsers.each do |browser_spec|
       begin
-        run_browser(browser_spec, block)
+        run_driver(browser_spec, block)
       rescue  => error
         @browser.close_current_browser_session if @browser
         @error = error.message
@@ -110,6 +111,41 @@ class SeleniumShots < ActionController::IntegrationTest
       end
     end
     assert @error.nil?, "Expected zero failures or errors, but got #{@error}\n"
+  end
+  
+  
+  def run_webdriver(browser_spec, block)
+    
+    if SeleniumConfig.mode == "local"
+      if /(firefox)/i.match(browser_spec)
+        @driver = Selenium::WebDriver.for(:firefox)
+      elsif /(chrome)/i.match(browser_spec)
+        @driver = Selenium::WebDriver.for(:chrome)
+      elsif /(ie)/i.match(browser_spec)
+        @driver = Selenium::WebDriver.for(:ie)
+    else
+      if /(firefox)/i.match(browser_spec)
+        @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :firefox, )
+      elsif /(chrome)/i.match(browser_spec)
+        @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :chrome)
+      elsif /(ie)/i.match(browser_spec)
+        @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :ie)
+    end
+    
+    @driver.manage.timeouts.implicit_wait = 2 #seconds
+    Selenium::WebDriver::Remote::Http::Default.timeout = 20 #seconds
+    
+    begin
+      block.call(@browser)
+    rescue  => error
+      @error = error.message
+    ensure
+      save_test({:selenium_test_group_name => @@group, :selenium_test_name => @name,
+                :description => @description}) if SeleniumConfig.mode == "remote"
+      @driver.quit
+    end
+    
+      
   end
 
   def run_browser(browser_spec, block)
