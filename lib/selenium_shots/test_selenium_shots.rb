@@ -148,25 +148,6 @@ class SeleniumShots < ActionController::IntegrationTest
     end 
   end
 
-  def run_browser(browser_spec, block)
-    @browser = Selenium::Client::Driver.new(
-                                           :host => HOST,
-                                           :port => PORT,
-                                           :browser => browser_spec,
-                                           :url => SeleniumConfig.default_browser_url,
-                                           :timeout_in_second => 200)
-    @browser.start_new_browser_session
-    begin
-      block.call(@browser)
-    rescue  => error
-      @error = error.message
-    ensure
-      save_test({:selenium_test_group_name => @@group, :selenium_test_name => @name,
-                :description => @description}) if SeleniumConfig.mode == "remote"
-      @browser.close_current_browser_session
-    end
-  end
-
   def capture_screenshot_on(src)
     browser.window_focus
     browser.window_maximize
