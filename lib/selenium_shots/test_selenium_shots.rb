@@ -126,7 +126,7 @@ class SeleniumShots < ActionController::IntegrationTest
       end
     else
       if /(firefox)/i.match(browser_spec)
-        @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :firefox, )
+        @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :firefox)
       elsif /(chrome)/i.match(browser_spec)
         @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :chrome)
       elsif /(ie)/i.match(browser_spec)
