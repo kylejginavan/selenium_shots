@@ -79,7 +79,7 @@ class SeleniumShots < ActionController::IntegrationTest
     if block_given?
       define_method(test_name) do
         @description = description
-        run_in_all_browsers do |browser|
+        run_in_html_unit do |browser|
           instance_evel &block
         end
       end
@@ -98,7 +98,7 @@ class SeleniumShots < ActionController::IntegrationTest
     if block_given?
      define_method(test_name) do
        @description = description
-       ru
+       run_in_html_unit do 
        run_in_all_browsers do |browser|
          instance_eval &block
        end
@@ -109,7 +109,7 @@ class SeleniumShots < ActionController::IntegrationTest
       end
     end
   end
-=begin  
+
   def run_in_html_unit(&block)
     @error = nil
     begin
@@ -117,12 +117,9 @@ class SeleniumShots < ActionController::IntegrationTest
     rescue
       @driver.quit if @driver
       @error = error.message
-      if @error.match(/Failed to start new browser session/) && SeleniumConfig.mode == "local"
-        @tmp_browser ||= local_browsers
-      end
     end
   end
-=end
+
   def run_in_all_browsers(&block)
     @error = nil
     browsers = (@selected_browser || selected_browsers)
@@ -156,6 +153,8 @@ class SeleniumShots < ActionController::IntegrationTest
         @driver = Selenium::WebDriver.for(:chrome)
       elsif /(ie)/i.match(browser_spec)
         @driver = Selenium::WebDriver.for(:ie)
+      elsif /(htmlunit)/i.match(browser_spec)
+        @driver = Selenium::WebDriver.for(:htmlunit)
       end
     else
       if /(firefox)/i.match(browser_spec)
@@ -164,6 +163,8 @@ class SeleniumShots < ActionController::IntegrationTest
         @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :chrome)
       elsif /(ie)/i.match(browser_spec)
         @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :ie)
+      elsif /(htmlunit)/i.match(browser_spec)
+        @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :htm_unit)
       end
     end
     
