@@ -70,6 +70,25 @@ class SeleniumShots < ActionController::IntegrationTest
       end
     end
   end
+  
+  def self.selenium_test(description, &block)
+    @@group = (@group || "Default")
+    test_name = "test_#{description.gsub(/\s+/,'_')}".to_sym
+    defined = instance_method(test_name) rescue false
+    raise "#{test_name} is already defined in #{self}" if defined
+    if block_given?
+      define_method(test_name) do
+        @description = description
+        run_in_all_browsers do |browser|
+          instance_evel &block
+        end
+      end
+    else
+      define_method(test_name) do
+        flunk "No implementation provided for #{name}"
+      end
+    end
+  end
 
   def self.selenium_shot(description, &block)
     @@group = (@group || "Default")
@@ -79,6 +98,7 @@ class SeleniumShots < ActionController::IntegrationTest
     if block_given?
      define_method(test_name) do
        @description = description
+       ru
        run_in_all_browsers do |browser|
          instance_eval &block
        end
@@ -89,7 +109,20 @@ class SeleniumShots < ActionController::IntegrationTest
       end
     end
   end
-
+=begin  
+  def run_in_html_unit(&block)
+    @error = nil
+    begin
+      run_webdriver("htmlunit", block)
+    rescue
+      @driver.quit if @driver
+      @error = error.message
+      if @error.match(/Failed to start new browser session/) && SeleniumConfig.mode == "local"
+        @tmp_browser ||= local_browsers
+      end
+    end
+  end
+=end
   def run_in_all_browsers(&block)
     @error = nil
     browsers = (@selected_browser || selected_browsers)
@@ -97,7 +130,7 @@ class SeleniumShots < ActionController::IntegrationTest
       begin
         run_webdriver(browser_spec, block)
       rescue  => error
-        @browser.close_current_browser_session if @browser
+        @driver.quit if @driver
         @error = error.message
         if @error.match(/Failed to start new browser session/) && SeleniumConfig.mode == "local"
           @tmp_browsers ||= local_browsers
