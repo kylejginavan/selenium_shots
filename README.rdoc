@@ -3,6 +3,53 @@
 http://www.seleniumshots.com
 Selenium Shots is an Integration Testing Service that transparently distributes your integration tests across multiple operating systems with different versions of all major browsers AND captures a screen shot. This eliminates the need to have multiple vm's on your computer or the need for multiple machines on your test to test your web application.  Running your tests remotely will dramatically speed up in-browser web testing and leave more time to  and create a slide show available to confirm visuals making it easy for you to improve your web application.
 
+== Install
+
+=== Rails 3
+
+Add this to your Gemfile:
+
+  group :development do
+    gem 'selenium_shots'
+  end
+
+=== Rails 2
+
+To install add teh following to config/environment.rb:
+
+  config.gem 'selenium_shots'
+  
+== Configure
+
+In configure/selenium_shots.yml you will need to define the application
+* api_key
+* mode
+* default_browser_url
+* application_name
+* local_browser
+* browsers
+
+== Creating Tests
+
+
+   class MyTest < SeleniumShots
+  
+     @group = "MyTestGroup"
+  
+     selenium_shot "Should run my test and pass." do
+       @name = "My Test Name"
+       browser.open "/my_site"
+       browser.type "search[query]", "Cats"
+       browser.click "find"
+     end
+   end
+   
+== Selenium Setup
+Download the latest version of selenium grid from http://seleniumhq.org/download/
+
+===Using a Custom Selenium Server
+`ant launch-remote-control -DcustomRemoteControl=/path/to/your/customer/selenium-server.jar`
+
 == Copyright
 
 Copyright (c) 2010 Kyle Ginavan. See LICENSE for details.
