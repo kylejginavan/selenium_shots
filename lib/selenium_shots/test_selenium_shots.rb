@@ -164,7 +164,7 @@ class SeleniumShots < ActionController::IntegrationTest
       elsif /(ie)/i.match(browser_spec)
         @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :ie)
       elsif /(htmlunit)/i.match(browser_spec)
-        @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :htm_unit)
+        @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :htmlunit)
       end
     end
     
