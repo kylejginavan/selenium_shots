@@ -15,6 +15,7 @@ begin
     gem.bindir = 'bin'
     gem.files = Dir['lib/**/*.rb'] + Dir['vendor/*']
     gem.add_development_dependency "thoughtbot-shoulda", ">= 0"
+    gem.add_development_dependency "rspec", "= 1.1.12"
     gem.add_dependency('selenium-client','>=1.2.18')
     gem.add_dependency('rest-client','>=0.8.2')
   end
