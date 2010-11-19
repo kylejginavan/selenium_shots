@@ -7,7 +7,7 @@ class SeleniumShots::Client
 
 	attr_reader :host, :api_key
 
-	def initialize(api_key, host='seleniumshots.com')
+	def initialize(api_key, host='www.seleniumshots.com')
 		@api_key  = api_key
 		@host     = host
 	end
