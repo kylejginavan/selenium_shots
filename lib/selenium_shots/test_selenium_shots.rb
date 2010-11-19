@@ -153,6 +153,8 @@ class SeleniumShots < ActionController::IntegrationTest
         @driver = Selenium::WebDriver.for(:chrome)
       elsif /(ie)/i.match(browser_spec)
         @driver = Selenium::WebDriver.for(:ie)
+      elsif /(safari)/i.match(browser_spec)
+        @driver = Selenium::WebDriver.for(:safari)
       elsif /(htmlunit)/i.match(browser_spec)
         @driver = Selenium::WebDriver.for(:htmlunit)
       end
@@ -163,6 +165,8 @@ class SeleniumShots < ActionController::IntegrationTest
         @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :chrome)
       elsif /(ie)/i.match(browser_spec)
         @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :ie)
+      elsif /(safari)/i.match(browser_spec)
+        @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :safari)
       elsif /(htmlunit)/i.match(browser_spec)
         @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :htmlunit)
       end
