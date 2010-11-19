@@ -28,8 +28,7 @@ Gem::Specification.new do |s|
      "lib/selenium_shots/cli/commands/help.rb",
      "lib/selenium_shots/cli/commands/server.rb",
      "lib/selenium_shots/cli/init.rb",
-     "lib/selenium_shots/test_selenium_shots.rb",
-     "vendor/selenium-server-standalone-2.0a7.jar"
+     "lib/selenium_shots/test_selenium_shots.rb"
   ]
   s.homepage = %q{http://github.com/kylejginavan/selenium_shots}
   s.rdoc_options = ["--charset=UTF-8"]
