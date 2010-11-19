@@ -110,13 +110,9 @@ class SeleniumShots < ActionController::IntegrationTest
         profile.native_events = true
         @driver = Selenium::WebDriver.for(:firefox, :profile => profile)
       elsif /(chrome)/i.match(browser_spec)
-        profile = Selenium::WebDriver::Chrome::Profile.new
-        profile.native_events = true
-        @driver = Selenium::WebDriver.for(:chrome, :profile => profile)
+        @driver = Selenium::WebDriver.for(:chrome)
       elsif /(ie)/i.match(browser_spec)
-        profile = Selenium::WebDriver::Internet_Explorer::Profile.new
-        profile.native_events = true
-        @driver = Selenium::WebDriver.for(:ie, :profile => profile)
+        @driver = Selenium::WebDriver.for(:ie)
       end
     else
       caps = nil
