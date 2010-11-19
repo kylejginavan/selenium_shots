@@ -57,7 +57,7 @@ api_key: "#{api_key}"
 mode: "remote" # "local" for run test locally
 default_browser_url: "http://www.myapp.com"
 application_name: "#{name}"
-local_browser: "*firefox3"
+local_browser: "firefox"
 browsers:
     - IE8 on XP
     - Firefox3.6 on XP

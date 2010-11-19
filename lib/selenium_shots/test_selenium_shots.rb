@@ -18,7 +18,7 @@ end
 
 class SeleniumShots < ActionController::IntegrationTest
 
-  attr_reader :driver, :agent
+  attr_reader :driver, :agent, :take_screenshot
   cattr_accessor :expected_test_count
 
   if SeleniumConfig.mode == "remote"
@@ -37,7 +37,7 @@ class SeleniumShots < ActionController::IntegrationTest
   end
 
   def local_browsers
-    ["*firefox3", "*iexplore", "*safari"]
+    ["firefox", "ie", "chrome"]
   end
 
   def selected_browsers
@@ -51,54 +51,17 @@ class SeleniumShots < ActionController::IntegrationTest
      end
     end
   end
-
-  def setup
-    if(not self.class.expected_test_count)
-      self.class.expected_test_count = (self.class.instance_methods.reject{|method| method[0..3] != 'test'}).length
-      if SeleniumConfig.mode == "local"
-        FileUtils.rm(pid_file) if  File.exists?(pid_file)
-        IO.popen("selenium_shots_local_server start 2>&1")
-        sleep(2)
-      end
-    end
-  end
-
-  def teardown
-    if((self.class.expected_test_count-=1) == 0)
-      if File.exists?(pid_file) && SeleniumConfig.mode == "local"
-        IO.popen("selenium_shots_local_server stop 2>&1")
-      end
-    end
-  end
   
-  def self.selenium_test(description, &block)
+  def self.core_test(description, take_screenshot = true, &block)
     @@group = (@group || "Default")
     test_name = "test_#{description.gsub(/\s+/,'_')}".to_sym
     defined = instance_method(test_name) rescue false
     raise "#{test_name} is already defined in #{self}" if defined
     if block_given?
       define_method(test_name) do
-        @description = description
-        run_in_html_unit do |browser|
-          instance_evel &block
-        end
-      end
-    else
-      define_method(test_name) do
-        flunk "No implementation provided for #{name}"
-      end
-    end
-  end
-
-  def self.selenium_shot(description, &block)
-    @@group = (@group || "Default")
-    test_name = "test_#{description.gsub(/\s+/,'_')}".to_sym
-    defined = instance_method(test_name) rescue false
-    raise "#{test_name} is already defined in #{self}" if defined
-    if block_given?
-      define_method(test_name) do
-        @description = description
-        run_in_all_browsers do #|driver|
+        @description     = description
+        @take_screenshot = take_screenshot
+        run_in_all_browsers do
           instance_eval &block
         end
       end
@@ -107,6 +70,14 @@ class SeleniumShots < ActionController::IntegrationTest
         flunk "No implementation provided for #{name}"
       end
     end
+  end
+
+  def self.selenium_test(description, &block)
+    core_test(description, nil, &block)
+  end
+
+  def self.selenium_shot(description, &block)
+    core_test(description, true, &block)
   end
 
   def run_in_all_browsers(&block)
@@ -132,10 +103,9 @@ class SeleniumShots < ActionController::IntegrationTest
     assert @error.nil?, "Expected zero failures or errors, but got #{@error}\n"
   end
   
-  
   def run_webdriver(browser_spec, block)
-    
     if SeleniumConfig.mode == "local"
+<<<<<<< HEAD
       if /(firefox)/i.match(browser_spec)
         profile = Selenium::WebDriver::Firefox::Profile.new
         profile.native_events = true
@@ -153,6 +123,7 @@ class SeleniumShots < ActionController::IntegrationTest
       elsif /(htmlunit)/i.match(browser_spec)
         @driver = Selenium::WebDriver.for(:htmlunit)
       end
+      @driver = Selenium::WebDriver.for(browser_spec.to_sym)
     else
       caps = nil
       if /(firefox)/i.match(browser_spec)
@@ -176,7 +147,6 @@ class SeleniumShots < ActionController::IntegrationTest
     
     @driver.manage.timeouts.implicit_wait = 2 #seconds
     Selenium::WebDriver::Remote::Http::Default.timeout = 20 #seconds
-    
     @driver.navigate.to SeleniumConfig.default_browser_url
 
     begin
@@ -194,23 +164,23 @@ class SeleniumShots < ActionController::IntegrationTest
     browser.window_focus
     browser.window_maximize
     sleep(2)
-    if @driver.browser.match(/XP/)
+    if @driver.browser.to_s.match(/XP/)
       @driver.capture_entire_page_screenshot("#{PICS_WINDOWS_PATH}\\#{src}", "background=#FFFFFF")
-    elsif @driver.browser.match(/SnowLeopard/)
+    elsif @driver.browser.to_s.match(/SnowLeopard/)
       @driver.capture_entire_page_screenshot("#{PICS_MACOS_PATH}/#{src}", "background=#FFFFFF")
-    elsif @driver.browser.match(/Linux/)
+    elsif @driver.browser.to_s.match(/Linux/)
       @driver.capture_entire_page_screenshot("#{PICS_LINUX_PATH}/#{src}", "background=#FFFFFF")
     end
   end
 
   def save_test(params)
     src = "#{SeleniumConfig.application_name}_#{params[:selenium_test_group_name]}_#{params[:selenium_test_name]}_" +
-          "#{@driver.browser.gsub(/\s+/,"_").downcase}.png"
+           "#{@driver.browser.to_s.gsub(/\s+/,"_").downcase}.png"
 
     capture_screenshot_on(src)
 
     SeleniumTest.create(:selenium_test_name => params[:selenium_test_name], :description => params[:description],
-      :url => @driver.location, :error_message => @error, :is_error => !@error.nil?, :environment => @driver.browser,
+      :url => @driver.current_url, :error_message => @error, :is_error => !@error.nil?, :environment => @driver.browser.to_s,
       :selenium_test_group_name => params[:selenium_test_group_name], :application_name => SeleniumConfig.application_name)
   end
 end

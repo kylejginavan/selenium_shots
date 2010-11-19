@@ -5,11 +5,10 @@ class Google < SeleniumShots
   @group = "Google"
 
   selenium_shot "should search on google" do
-    @name = "selenium shots"
-    browser.open "/"
-    browser.wait_for_page_to_load "30000"
-    browser.type "q", "Selenium Shots"
-    browser.click "btnG"
+    @name = "Google search"
+    element = driver.find_element(:name, 'q')
+    element.send_keys "Hello WebDriver!"
+    element.submit
   end
 end
 
