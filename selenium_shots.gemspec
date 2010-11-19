@@ -26,7 +26,6 @@ Gem::Specification.new do |s|
      "lib/selenium_shots/cli/commands/auth.rb",
      "lib/selenium_shots/cli/commands/base.rb",
      "lib/selenium_shots/cli/commands/help.rb",
-     "lib/selenium_shots/cli/commands/server.rb",
      "lib/selenium_shots/cli/init.rb",
      "lib/selenium_shots/test_selenium_shots.rb"
   ]
