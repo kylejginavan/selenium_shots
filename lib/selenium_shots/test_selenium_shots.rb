@@ -137,28 +137,41 @@ class SeleniumShots < ActionController::IntegrationTest
     
     if SeleniumConfig.mode == "local"
       if /(firefox)/i.match(browser_spec)
-        @driver = Selenium::WebDriver.for(:firefox)
+        profile = Selenium::WebDriver::Firefox::Profile.new
+        profile.native_events = true
+        @driver = Selenium::WebDriver.for(:firefox, :profile => profile)
       elsif /(chrome)/i.match(browser_spec)
-        @driver = Selenium::WebDriver.for(:chrome)
+        profile = Selenium::WebDriver::Chrome::Profile.new
+        profile.native_events = true
+        @driver = Selenium::WebDriver.for(:chrome, :profile => profile)
       elsif /(ie)/i.match(browser_spec)
-        @driver = Selenium::WebDriver.for(:ie)
+        profile = Selenium::WebDriver::Internet_Explorer::Profile.new
+        profile.native_events = true
+        @driver = Selenium::WebDriver.for(:ie, :profile => profile)
       elsif /(safari)/i.match(browser_spec)
         @driver = Selenium::WebDriver.for(:safari)
       elsif /(htmlunit)/i.match(browser_spec)
         @driver = Selenium::WebDriver.for(:htmlunit)
       end
     else
+      caps = nil
       if /(firefox)/i.match(browser_spec)
-        @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :firefox)
+        caps = WebDriver::Remote::Capabilities.firefox
       elsif /(chrome)/i.match(browser_spec)
-        @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :chrome)
+        caps = WebDriver::Remote::Capabilities.chrome
       elsif /(ie)/i.match(browser_spec)
-        @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :ie)
+        caps = WebDriver::Remote::Capabilities.internet_explorer
       elsif /(safari)/i.match(browser_spec)
-        @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :safari)
+        caps = WebDriver::Remote::Capabilities.safari
       elsif /(htmlunit)/i.match(browser_spec)
-        @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => :htmlunit)
+        caps = WebDriver::Remote::Capabilities.htmlunit
+        caps.javascript_enabled = true
       end
+      
+      if caps
+        @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => caps)
+      end
+      
     end
     
     @driver.manage.timeouts.implicit_wait = 2 #seconds
