@@ -140,6 +140,7 @@ class SeleniumShots < ActionController::IntegrationTest
       block.call
     rescue  => error
       @error = error.message
+      puts @error
     ensure
       save_test({:selenium_test_group_name => @@group, :selenium_test_name => @name,
                 :description => @description}) if SeleniumConfig.mode == "remote"
