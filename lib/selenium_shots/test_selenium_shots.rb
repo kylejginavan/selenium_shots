@@ -104,15 +104,19 @@ class SeleniumShots < ActionController::IntegrationTest
   end
   
   def run_webdriver(browser_spec, block)
+    
+    client = Selenium::WebDriver::Remote::Http::Default.new
+    client.timeout = 20 # seconds
+    
     if SeleniumConfig.mode == "local"
       if /(firefox)/i.match(browser_spec)
         profile = Selenium::WebDriver::Firefox::Profile.new
         profile.native_events = false
-        @driver = Selenium::WebDriver.for(:firefox, :profile => profile)
+        @driver = Selenium::WebDriver.for(:firefox, :profile => profile, :http_client => client)
       elsif /(chrome)/i.match(browser_spec)
-        @driver = Selenium::WebDriver.for(:chrome)
+        @driver = Selenium::WebDriver.for(:chrome, :http_client => client)
       elsif /(ie)/i.match(browser_spec)
-        @driver = Selenium::WebDriver.for(:ie)
+        @driver = Selenium::WebDriver.for(:ie, :http_client => client)
       end
     else
       caps = nil
@@ -129,11 +133,10 @@ class SeleniumShots < ActionController::IntegrationTest
         caps.javascript_enabled = true
       end
 
-      @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => caps) if caps
+      @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => caps, :http_client => client) if caps
     end
     
     @driver.manage.timeouts.implicit_wait = 2 #seconds
-    Selenium::WebDriver::Remote::Http::Default.timeout = 20 #seconds
     @driver.navigate.to SeleniumConfig.default_browser_url
 
     begin
