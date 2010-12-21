@@ -7,7 +7,9 @@ require 'active_support/test_case'
 require 'ostruct'
 
 #load config
-SeleniumConfig = OpenStruct.new(YAML.load_file(Rails.root.join('config/selenium_shots.yml')))
+ASSET_ROOT = File.expand_path((defined?(Rails) && Rails.root.to_s.length > 0) ? Rails.root : ".") unless defined?(ASSET_ROOT)
+
+SeleniumConfig = OpenStruct.new(YAML.load_file(ASSET_ROOT + '/config/selenium_shots.yml'))
 #
 
 #activeresource models
