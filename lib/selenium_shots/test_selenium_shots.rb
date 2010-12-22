@@ -73,6 +73,10 @@ class SeleniumShots < ActionController::IntegrationTest
       end
     end
   end
+  
+  def self.base_url(rel="")
+    SeleniumConfig.default_browser_url + rel
+  end
 
   def self.selenium_test(description, &block)
     core_test(description, nil, &block)
@@ -139,7 +143,7 @@ class SeleniumShots < ActionController::IntegrationTest
     end
     
     @driver.manage.timeouts.implicit_wait = 2 #seconds
-    @driver.navigate.to SeleniumConfig.default_browser_url
+    @driver.navigate.to base_url
 
     begin
       block.call
