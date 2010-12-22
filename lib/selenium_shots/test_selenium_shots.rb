@@ -74,7 +74,7 @@ class SeleniumShots < ActionController::IntegrationTest
     end
   end
   
-  def self.base_url(rel="")
+  def base_url(rel="")
     SeleniumConfig.default_browser_url + rel
   end
 
