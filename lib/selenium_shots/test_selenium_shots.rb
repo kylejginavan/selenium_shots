@@ -114,7 +114,7 @@ class SeleniumShots < ActionController::IntegrationTest
 
     if SeleniumConfig.mode == "local"
       if /(firefox)/i.match(browser_spec)
-        @driver = Selenium::WebDriver.for :firefox
+        @driver = Selenium::WebDriver.for(:firefox, :profile =>  WebDriver::Firefox::Profile.new)
       elsif /(chrome)/i.match(browser_spec)
         @driver = Selenium::WebDriver.for :chrome
       elsif /(ie)/i.match(browser_spec)
