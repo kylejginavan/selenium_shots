@@ -111,18 +111,14 @@ class SeleniumShots < ActionController::IntegrationTest
   
   def run_webdriver(browser_spec, block)
     
-    client = Selenium::WebDriver::Remote::Http::Default.new
-    client.timeout = 20 # seconds
-    
+
     if SeleniumConfig.mode == "local"
       if /(firefox)/i.match(browser_spec)
-        profile = Selenium::WebDriver::Firefox::Profile.new
-        profile.native_events = false
-        @driver = Selenium::WebDriver.for(:firefox, :profile => profile, :http_client => client)
+        @driver = Selenium::WebDriver.for :firefox
       elsif /(chrome)/i.match(browser_spec)
-        @driver = Selenium::WebDriver.for(:chrome, :http_client => client)
+        @driver = Selenium::WebDriver.for :chrome
       elsif /(ie)/i.match(browser_spec)
-        @driver = Selenium::WebDriver.for(:ie, :http_client => client)
+        @driver = Selenium::WebDriver.for :ie
       end
     else
       caps = nil

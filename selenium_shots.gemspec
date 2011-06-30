@@ -58,13 +58,13 @@ Gem::Specification.new do |s|
     else
       s.add_dependency(%q<thoughtbot-shoulda>, [">= 0"])
       s.add_dependency(%q<rspec>, ["= 1.1.12"])
-      s.add_dependency(%q<selenium-webdriver>, [">= 0.1.0"])
+      s.add_dependency(%q<selenium-webdriver>, [">= 0.2.2"])
       s.add_dependency(%q<rest-client>, [">= 0.8.2"])
     end
   else
     s.add_dependency(%q<thoughtbot-shoulda>, [">= 0"])
     s.add_dependency(%q<rspec>, ["= 1.1.12"])
-    s.add_dependency(%q<selenium-webdriver>, [">= 0.1.0"])
+    s.add_dependency(%q<selenium-webdriver>, [">= 0.2.2"])
     s.add_dependency(%q<rest-client>, [">= 0.8.2"])
   end
 end
